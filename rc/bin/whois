@@ -1,0 +1,6 @@
+#!/bin/rc
+
+for(i in $*)
+	grep '^'$i'	' /adm/whois ||
+	grep -i $i /adm/whois ||
+	echo who indeed is $i

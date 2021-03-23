@@ -1,0 +1,97 @@
+.TH IPCONFIG 8
+.SH NAME
+ipconfig, arpd, rip \- Internet configuration and routing
+.SH SYNOPSIS
+.B ip/ipconfig
+.RB [ -abp ]
+.RB [ -e
+.IR etherdev ]
+.RB [ -m
+.IR ip-mask ]
+.RI [ ipaddr ]
+.PP
+.B ip/arpd
+.RB [ -pd ]
+.RB [ -e
+.IR etherdev ]
+.RB [ -b
+.IR bcast-addr ]
+.PP
+.B ip/rip
+.RB [ -b ]
+.SH DESCRIPTION
+.I Ipconfig
+configures an Internet connection on an Ethernet.
+The options are
+.TP
+.B a
+do not start 
+.I arpd
+.TP
+.B b
+do not use
+.SM BOOTP 
+to discover a gateway address
+.TP
+.B p
+start
+.I arpd
+in promiscuous mode (see below)
+.TP
+.B e
+use the Ethernet mounted at
+.BI /net/ etherdev
+.TP
+.B m
+set the network mask to
+.I ip-mask
+.LP
+If
+.I ipaddr
+is specified on the command line, use that instead of
+one found in the local database or via the
+.SM BOOTP
+protocol.
+.PP
+.I Arpd
+performs the Internet Address Resolution Protocol, translating
+Internet addresses into Ethernet addresses.
+It is normally started by
+.IR ipconfig .
+The options are
+.TP
+.B d
+print debugging to standard output
+.TP
+.B p
+(promiscuous)
+answer ARP
+requests for any recognized machine.
+The default is to answer just for the machine running
+.IR arpd .
+.TP
+.B e
+use the Ethernet mounted at
+.BI /net/ etherdev
+.TP
+.B b
+use the IP broadcast address
+.I bcast-addr
+instead of the correct one.
+.PP
+.I Rip
+runs the routing protocol RIP.
+It listens for RIP packets on connected networks and
+updates the kernel routing tables.
+The only option,
+.BR -b ,
+broadcasts routing information onto the networks.
+.PP
+.SH SOURCE
+.B /sys/src/cmd/ip/ipconfig.c
+.br
+.B /sys/src/cmd/ip/arpd.c
+.br
+.B /sys/src/cmd/ip/rip.c
+.SH "SEE ALSO"
+.IR ndb (6)

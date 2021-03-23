@@ -1,0 +1,70 @@
+CONF=pc
+CONFLIST=pc pcdisk dos pccpu pccpudisk
+
+objtype=386
+</$objtype/mkfile
+CFLAGS=-w
+
+DEV=`{rc ../port/mkdevlist $CONF}
+LINK=`{rc ../port/mklinklist $CONF}
+MISC=`{rc ../port/mkmisclist $CONF}
+
+OBJ=\
+	l.$O\
+	alarm.$O\
+	alloc.$O\
+	auth.$O\
+	bbmalloc.$O\
+	chan.$O\
+	clock.$O\
+	dev.$O\
+	dma.$O\
+	kbd.$O\
+	fault.$O\
+	fault386.$O\
+	latin1.$O\
+	taslock.$O\
+	main.$O\
+	mmu.$O\
+	net.$O\
+	page.$O\
+	segment.$O\
+	swap.$O\
+	pgrp.$O\
+	print.$O\
+	proc.$O\
+	qlock.$O\
+	queue.$O\
+	sysfile.$O\
+	sysproc.$O\
+	trap.$O\
+	$DEV\
+	stream.$O\
+	boot$CONF.root.$O\
+	$MISC $LINK\
+	archgeneric.$O archnsx20.$O archncr3170.$O\
+
+default:V: 9$CONF
+
+9$CONF:	$OBJ $CONF.c /386/lib/libgnot.a
+	$CC $CFLAGS '-DKERNDATE='`{date -n} $CONF.c
+	$LD -o $target -T0x80100020 -l $OBJ $CONF.$O -lgnot -lg -lauth -lc
+	size 9$CONF
+
+vga.$O:		screen.h vga.h
+devvga.$O:	vga.h
+clock.$O fault386.$O main.$O:	/$objtype/include/ureg.h
+
+init.h:	initcode /sys/src/libc/9syscall/sys.h
+	$AS initcode
+	$LD -l -s -R4 -o init.out -s initcode.$O
+	{echo 'uchar initcode[]={'
+	 xd -r -1x init.out |
+		sed -e 's/^[0-9a-f]+ //' -e 's/ ([0-9a-f][0-9a-f])/0x\1,/g'
+	 echo '};'} > init.h
+
+<../port/portmkfile
+
+dossrv.root.s:	/$objtype/bin/dossrv
+	cp $prereq dossrv.out
+	../port/mkroot dossrv fs

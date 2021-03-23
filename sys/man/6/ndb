@@ -1,0 +1,204 @@
+.TH NDB 6
+.SH NAME
+ndb \- Network database
+.SH DESCRIPTION
+.PP
+The network database consists of files
+describing machines known to the local
+installation and machines known publicly.
+The files comprise multi-line tuples made up of
+attribute/value pairs of the form
+.IB attr = value
+or sometimes just
+.IR attr .
+Each line starting without white space starts a new tuple.
+Lines starting with
+.B #
+are comments.
+.PP
+The file
+.B /lib/ndb/local
+is the root of the database.
+Other files are included in the
+database if a tuple with an
+attribute-value pair of attribute
+.B database
+and no value exists in
+.BR /lib/ndb/local .
+Within the
+.B database
+tuple,
+each tuple with attribute
+.B file
+identifies a file to be included in the database.  The files are searched
+in the order they appear.
+For example:
+.IP
+.EX
+database=
+	file=/lib/ndb/common
+	file=/lib/ndb/local
+	file=/lib/ndb/global
+.EE
+.PP
+declares the database to be composed of the three files
+.BR /lib/ndb/common ,
+.BR /lib/ndb/local ,
+and 
+.BR /lib/ndb/global .
+By default,
+.B /lib/ndb/local
+is searched before the others.
+However,
+.B /lib/ndb/local
+may be included in the
+.B database
+to redefine its ordering.
+.PP
+Within tuples, pairs on the same line bind tighter than
+pairs on different lines.
+.PP
+The program
+.B ndb/cs
+(see
+.IR ndb (8))
+and the library routine
+.B ipinfo
+(see
+.IR ndb (2))
+perform searches for information relative to a particular host.
+.BR Ndb/cs
+resolves meta-addresses of the form
+.BI $ attribute
+by returning the
+.I value
+from the
+.IB attribute = value
+most closely related to the resolving host.
+The attribute-value pair comes from the tuple for the system, its subnet, or its network
+with the system tuple having precedence, subnet next, and network last.
+.PP
+A number of attributes are meaningful to programs and thus
+reserved.
+They are:
+.TF restricted
+.TP
+.B sys
+system name
+.TP
+.B dom
+Internet domain name
+.TP
+.B ip
+Internet address
+.TP
+.B ether
+Ethernet address
+.TP
+.B dk 
+Datakit address
+.TP
+.B bootf
+file to download for initial bootstrap
+.TP
+.B ipnet
+Internet network name
+.TP
+.B ipmask
+Internet network mask
+.TP
+.B ipgw
+Internet gateway
+.TP
+.B auth
+authentication server to be used
+.TP
+.B fs
+file server to be used
+.TP
+.B tcp
+a TCP service name
+.TP
+.B udp
+a UDP service name
+.TP
+.B il
+an IL service name
+.TP
+.B port
+a TCP, UDP, or IL port number
+.TP
+.B restricted
+a TCP service that can be called only by ports numbered
+less that 1024
+.TP
+.B proto
+a protocol supported by a host.
+The pair
+.B proto=il
+is needed by
+.I cs
+(see
+.IR ndb (8))
+in tuples for hosts that support the IL protocol.
+.TP
+.B 9P
+parameters for the 9P file protocol, in particular whether the server authenticates
+.RB ( 9P=auth ).
+.sp
+.PP
+The file
+.B /lib/ndb/auth
+is used during authentication to decide who has the power to `speak for' other
+users; see
+.IR auth (6).
+.SH EXAMPLES
+.LP
+A tuple for the CPU server, spindle.
+.LP
+.EX
+sys = spindle
+	dom=spindle.research.att.com
+	bootf=/mips/9powerboot
+	ip=135.104.117.32 ether=080069020677
+	dk=nj/astro/spindle
+	proto=il
+.EE
+.LP
+Entries for the network
+.B mh-astro-net
+and its subnets.
+.LP
+.EX
+ipnet=mh-astro-net ip=135.104.0.0 ipmask=255.255.255.0
+	fs=bootes.research.att.com
+	ipgw=r70.research.att.com
+	auth=p9auth.research.att.com
+ipnet=unix-room ip=135.104.117.0
+	ipgw=135.104.117.1
+ipnet=third-floor ip=135.104.51.0
+	ipgw=135.104.51.1
+.EE
+.LP
+Mappings between TCP service names and port numbers.
+.LP
+.EX
+.ta \w'\fLtcp=sysmonxxxxx'u \w'\fLtcp=sysmonxxxxxport=512xxx'u
+tcp=sysmon	port=401
+tcp=rexec	port=512	restricted
+tcp=9fs	port=564
+.EE
+.SH FILES
+.TP
+.B /lib/ndb/local
+first database file searched
+.TP
+.B /lib/ndb/global
+second database file searched
+.SH "SEE ALSO"
+.IR dial (2),
+.IR ndb (2),
+.IR ndb (8),
+.IR bootp (8),
+.IR ipconfig (8),
+.IR con (1)

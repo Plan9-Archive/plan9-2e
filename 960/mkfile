@@ -1,0 +1,8 @@
+CC=6c
+LD=6l
+O=6
+RL=rl
+AS=6a
+OS=2kv86x
+CPUS=mips 68020 sparc 386
+CFLAGS=

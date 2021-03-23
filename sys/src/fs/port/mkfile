@@ -1,0 +1,19 @@
+
+%.$O:	../port/%.c
+	$CC $CFLAGS ../port/$stem.c
+
+%.$O:	%.c
+	$CC $CFLAGS $stem.c
+
+%.$O:	%.s
+	$AS $stem.s
+
+%.$O:	$HFILES
+
+dk1.$O dk2.$O dk3.$O:	../port/dk.h
+
+fcall.$O:	../port/fcall.c
+	$CC -w ../port/fcall.c
+
+clean:V:
+	rm -f *.[$OS] [$OS].out $TARG

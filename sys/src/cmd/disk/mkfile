@@ -1,0 +1,35 @@
+</$objtype/mkfile
+
+TARG=exsort\
+	format\
+	kfscmd\
+	mkext\
+	mkfs\
+	prep\
+
+DIRS=kfs\
+	pip\
+
+OFILES=
+
+BIN=/$objtype/bin/disk
+</sys/src/cmd/mkmany
+
+all:V:	all-kfs
+
+install:V:	install-kfs ksync
+
+clean:V:	clean-kfs
+
+nuke:V:		nuke-kfs
+
+installall:V:	installall-kfs
+
+%-kfs:V:
+	for(i in $DIRS) @{
+		cd $i
+		mk $MKFLAGS $stem
+	}
+
+ksync:
+	touch $BIN/ksync
